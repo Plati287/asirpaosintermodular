@@ -1,0 +1,17 @@
+<!-- Instrucciones para crear no-image.jpg -->
+
+Para crear la imagen "no-image.jpg" puedes:
+
+OPCIÓN 1 - Usar Paint (Windows):
+1. Abre Paint
+2. Crea una imagen de 400x400 píxeles
+3. Rellena de gris (#CCCCCC)
+4. Escribe "Sin imagen" en el centro
+5. Guarda como "no-image.jpg" en la carpeta img/
+
+OPCIÓN 2 - Descargar online:
+1. Ve a https://via.placeholder.com/400x400/CCCCCC/666666?text=Sin+Imagen
+2. Haz clic derecho → Guardar imagen como
+3. Guárdala como "no-image.jpg" en la carpeta img/
+
+OPCIÓN 3 - Usar cualquier imagen gris de 400x400px
