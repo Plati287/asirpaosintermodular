@@ -14,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($cantidad < 1) $cantidad = 1;
     if ($cantidad > 10) $cantidad = 10;
     
-    // Obtener información del producto
     $sql = "SELECT p.*, c.categoria FROM productos p LEFT JOIN categoria c ON p.id_categoria = c.id WHERE p.id = ?";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "i", $producto_id);
@@ -22,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $result = mysqli_stmt_get_result($stmt);
     
     if ($producto = mysqli_fetch_assoc($result)) {
-        // Simulación de precios
         $precios = [
             1 => 2499.99, 2 => 3999.99, 3 => 899.99, 4 => 1899.99, 5 => 2999.99,
             6 => 2199.99, 7 => 899.99, 8 => 1099.99, 9 => 449.99, 10 => 599.99,
@@ -34,12 +32,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         $precio = isset($precios[$producto_id]) ? $precios[$producto_id] : 99.99;
         
-        // Inicializar carrito si no existe
         if (!isset($_SESSION['carrito'])) {
             $_SESSION['carrito'] = array();
         }
         
-        // Verificar si el producto ya está en el carrito
         if (isset($_SESSION['carrito'][$producto_id])) {
             $_SESSION['carrito'][$producto_id]['cantidad'] += $cantidad;
         } else {
