@@ -2,10 +2,8 @@
 require_once 'includes/config.php';
 require_once 'includes/funciones.php';
 
-// Obtener categorías para filtro
 $categorias = obtenerCategorias($conn);
 
-// Filtrar productos
 $where = "WHERE 1=1";
 $params = array();
 
@@ -21,7 +19,6 @@ if (isset($_GET['buscar']) && !empty($_GET['buscar'])) {
     $params[] = $buscar;
 }
 
-// Obtener productos
 $sql = "SELECT p.*, c.categoria 
         FROM productos p 
         LEFT JOIN categoria c ON p.id_categoria = c.id 
