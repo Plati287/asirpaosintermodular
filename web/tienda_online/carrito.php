@@ -7,7 +7,6 @@ if (!estaLogueado()) {
     exit();
 }
 
-// Actualizar cantidad
 if (isset($_POST['actualizar'])) {
     $producto_id = intval($_POST['producto_id']);
     $cantidad = intval($_POST['cantidad']);
@@ -19,7 +18,6 @@ if (isset($_POST['actualizar'])) {
     exit();
 }
 
-// Eliminar producto
 if (isset($_GET['eliminar'])) {
     $producto_id = intval($_GET['eliminar']);
     unset($_SESSION['carrito'][$producto_id]);
@@ -27,7 +25,6 @@ if (isset($_GET['eliminar'])) {
     exit();
 }
 
-// Vaciar carrito
 if (isset($_GET['vaciar'])) {
     $_SESSION['carrito'] = array();
     header('Location: carrito.php');
