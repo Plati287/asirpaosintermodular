@@ -14,7 +14,6 @@ if (empty($carrito)) {
     exit();
 }
 
-// Obtener datos del usuario
 $sql = "SELECT * FROM clientes WHERE id = ?";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, "i", $_SESSION['usuario_id']);
@@ -31,11 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($direccion_envio)) {
         $error = 'La dirección de envío es obligatoria';
     } else {
-        // Iniciar transacción
         mysqli_begin_transaction($conn);
         
         try {
-            // Crear pedido
             $fecha_envio = date('Y-m-d', strtotime('+3 days'));
             $sql = "INSERT INTO pedidos (id_cliente, estado, direccion_envio, fecha_envio) VALUES (?, 'Pendiente', ?, ?)";
             $stmt = mysqli_prepare($conn, $sql);
@@ -44,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             $pedido_id = mysqli_insert_id($conn);
             
-            // Insertar líneas de pedido
             $sql = "INSERT INTO linea_pedido (id_pedido, id_producto, cantidad, precio_unidad) VALUES (?, ?, ?, ?)";
             $stmt = mysqli_prepare($conn, $sql);
             
@@ -53,10 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 mysqli_stmt_execute($stmt);
             }
             
-            // Confirmar transacción
             mysqli_commit($conn);
             
-            // Vaciar carrito
             $_SESSION['carrito'] = array();
             
             $exito = true;
