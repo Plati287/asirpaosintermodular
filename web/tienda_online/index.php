@@ -2,10 +2,8 @@
 require_once 'includes/config.php';
 require_once 'includes/funciones.php';
 
-// Obtener categorías para filtro
 $categorias = obtenerCategorias($conn);
 
-// Filtrar productos
 $where = "WHERE 1=1";
 $params = array();
 
@@ -21,7 +19,6 @@ if (isset($_GET['buscar']) && !empty($_GET['buscar'])) {
     $params[] = $buscar;
 }
 
-// Obtener productos
 $sql = "SELECT p.*, c.categoria 
         FROM productos p 
         LEFT JOIN categoria c ON p.id_categoria = c.id 
@@ -102,7 +99,6 @@ $result = mysqli_stmt_get_result($stmt);
 
         <div class="productos-grid">
             <?php 
-            // Array de precios de productos
             $precios = [
                 1 => 2499.99, 2 => 3999.99, 3 => 899.99, 4 => 1899.99, 5 => 2999.99,
                 6 => 2199.99, 7 => 899.99, 8 => 1099.99, 9 => 449.99, 10 => 599.99,
