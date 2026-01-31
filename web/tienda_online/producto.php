@@ -9,7 +9,6 @@ if (!isset($_GET['id'])) {
 
 $producto_id = intval($_GET['id']);
 
-// Obtener producto
 $sql = "SELECT p.*, c.categoria 
         FROM productos p 
         LEFT JOIN categoria c ON p.id_categoria = c.id 
@@ -26,7 +25,6 @@ if (mysqli_num_rows($result) == 0) {
 
 $producto = mysqli_fetch_assoc($result);
 
-// Simulación de precios (en una app real estarían en la BD)
 $precios = [
     1 => 2499.99, 2 => 3999.99, 3 => 899.99, 4 => 1899.99, 5 => 2999.99,
     6 => 2199.99, 7 => 899.99, 8 => 1099.99, 9 => 449.99, 10 => 599.99,
