@@ -13,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $telefono = limpiarEntrada($_POST['telefono']);
     $ciudad = limpiarEntrada($_POST['ciudad']);
     
-    // Validaciones
     if (empty($usuario) || empty($contrasena) || empty($contrasena2)) {
         $error = 'Todos los campos obligatorios deben estar completos';
     } elseif ($contrasena !== $contrasena2) {
@@ -21,7 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (strlen($contrasena) < 6) {
         $error = 'La contraseña debe tener al menos 6 caracteres';
     } else {
-        // Verificar si el usuario ya existe
         $sql = "SELECT id FROM clientes WHERE usuario = ?";
         $stmt = mysqli_prepare($conn, $sql);
         mysqli_stmt_bind_param($stmt, "s", $usuario);
@@ -31,10 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (mysqli_num_rows($result) > 0) {
             $error = 'El nombre de usuario ya está en uso';
         } else {
-            // Encriptar contraseña
             $contrasena_hash = password_hash($contrasena, PASSWORD_DEFAULT);
             
-            // Insertar nuevo usuario
             $sql = "INSERT INTO clientes (usuario, contrasena, direccion, telefono, ciudad) VALUES (?, ?, ?, ?, ?)";
             $stmt = mysqli_prepare($conn, $sql);
             mysqli_stmt_bind_param($stmt, "sssss", $usuario, $contrasena_hash, $direccion, $telefono, $ciudad);
