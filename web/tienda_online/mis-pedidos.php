@@ -7,7 +7,6 @@ if (!estaLogueado()) {
     exit();
 }
 
-// Obtener pedidos del usuario
 $sql = "SELECT * FROM pedidos WHERE id_cliente = ? ORDER BY id_pedido DESC";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, "i", $_SESSION['usuario_id']);
@@ -67,7 +66,6 @@ $result = mysqli_stmt_get_result($stmt);
                     mysqli_stmt_execute($stmt_productos);
                     $productos = mysqli_stmt_get_result($stmt_productos);
                     
-                    // Calcular total del pedido
                     $total_pedido = 0;
                     $productos_array = array();
                     while ($prod = mysqli_fetch_assoc($productos)) {
@@ -75,7 +73,6 @@ $result = mysqli_stmt_get_result($stmt);
                         $total_pedido += $prod['precio_unidad'] * $prod['cantidad'];
                     }
                     
-                    // Determinar clase del estado
                     $estado_class = 'estado-pendiente';
                     if ($pedido['estado'] == 'En tránsito') {
                         $estado_class = 'estado-entransito';
