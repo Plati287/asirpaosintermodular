@@ -48,7 +48,7 @@ $precio = isset($precios[$producto_id]) ? $precios[$producto_id] : 99.99;
     <header>
         <div class="header-container">
             <div class="logo">
-                <h1>🖥️ TechStore</h1>
+                <h1>TechStore</h1>
             </div>
             <nav>
                 <ul>
@@ -63,7 +63,7 @@ $precio = isset($precios[$producto_id]) ? $precios[$producto_id] : 99.99;
                 <?php if (estaLogueado()): ?>
                     <span>Hola, <?php echo obtenerNombreUsuario(); ?></span>
                     <a href="carrito.php" class="carrito-link">
-                        🛒 Carrito <span class="carrito-count"><?php echo contarItemsCarrito(); ?></span>
+                        Carrito <span class="carrito-count"><?php echo contarItemsCarrito(); ?></span>
                     </a>
                     <a href="logout.php" class="btn btn-secondary">Salir</a>
                 <?php else: ?>
