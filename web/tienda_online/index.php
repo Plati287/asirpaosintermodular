@@ -60,7 +60,7 @@ $result = mysqli_stmt_get_result($stmt);
                 <?php if (estaLogueado()): ?>
                     <span>Hola, <?php echo obtenerNombreUsuario(); ?></span>
                     <a href="carrito.php" class="carrito-link">
-                        🛒 Carrito <span class="carrito-count"><?php echo contarItemsCarrito(); ?></span>
+                        Carrito <span class="carrito-count"><?php echo contarItemsCarrito(); ?></span>
                     </a>
                     <a href="logout.php" class="btn btn-secondary">Salir</a>
                 <?php else: ?>
