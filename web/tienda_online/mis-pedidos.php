@@ -45,7 +45,7 @@ $result = mysqli_stmt_get_result($stmt);
     </header>
 
     <div class="container">
-        <h1 style="margin-bottom: 30px;">📦 Mis Pedidos</h1>
+        <h1 style="margin-bottom: 30px;">Mis Pedidos</h1>
         
         <?php if (mysqli_num_rows($result) == 0): ?>
             <div class="carrito-vacio">
