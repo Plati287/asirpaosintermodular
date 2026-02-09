@@ -1,15 +1,12 @@
 <?php
-// Función para verificar si el usuario está logueado
 function estaLogueado() {
     return isset($_SESSION['usuario_id']);
 }
 
-// Función para obtener el nombre del usuario
 function obtenerNombreUsuario() {
     return isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'] : '';
 }
 
-// Función para contar items del carrito
 function contarItemsCarrito() {
     if (!isset($_SESSION['carrito']) || empty($_SESSION['carrito'])) {
         return 0;
@@ -21,12 +18,10 @@ function contarItemsCarrito() {
     return $total;
 }
 
-// Función para formatear precio
 function formatearPrecio($precio) {
     return number_format($precio, 2, ',', '.') . ' €';
 }
 
-// Función para limpiar entrada
 function limpiarEntrada($dato) {
     $dato = trim($dato);
     $dato = stripslashes($dato);
@@ -34,7 +29,6 @@ function limpiarEntrada($dato) {
     return $dato;
 }
 
-// Función para obtener categorías
 function obtenerCategorias($conn) {
     $sql = "SELECT * FROM categoria ORDER BY categoria";
     $result = mysqli_query($conn, $sql);
