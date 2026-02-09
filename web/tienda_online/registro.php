@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <header>
         <div class="header-container">
             <div class="logo">
-                <h1>🖥️ TechStore</h1>
+                <h1>TechStore</h1>
             </div>
             <nav>
                 <ul>
