@@ -81,7 +81,7 @@ $total_final = $total + $envio;
     <header>
         <div class="header-container">
             <div class="logo">
-                <h1>🖥️ TechStore</h1>
+                <h1>TechStore</h1>
             </div>
             <nav>
                 <ul>
@@ -103,7 +103,7 @@ $total_final = $total + $envio;
     <div class="container">
         <?php if ($exito): ?>
             <div class="form-container" style="max-width: 600px;">
-                <h2>✅ ¡Pedido realizado con éxito!</h2>
+                <h2>¡Pedido realizado con éxito!</h2>
                 <div class="mensaje exito">
                     Tu pedido ha sido procesado correctamente
                 </div>
