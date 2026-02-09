@@ -25,7 +25,7 @@ $result = mysqli_stmt_get_result($stmt);
     <header>
         <div class="header-container">
             <div class="logo">
-                <h1>🖥️ TechStore</h1>
+                <h1>TechStore</h1>
             </div>
             <nav>
                 <ul>
@@ -37,7 +37,7 @@ $result = mysqli_stmt_get_result($stmt);
             <div class="user-info">
                 <span>Hola, <?php echo obtenerNombreUsuario(); ?></span>
                 <a href="carrito.php" class="carrito-link">
-                    🛒 Carrito <span class="carrito-count"><?php echo contarItemsCarrito(); ?></span>
+                    Carrito <span class="carrito-count"><?php echo contarItemsCarrito(); ?></span>
                 </a>
                 <a href="logout.php" class="btn btn-secondary">Salir</a>
             </div>
@@ -56,7 +56,6 @@ $result = mysqli_stmt_get_result($stmt);
         <?php else: ?>
             <div class="pedidos-lista">
                 <?php while ($pedido = mysqli_fetch_assoc($result)): 
-                    // Obtener productos del pedido
                     $sql_productos = "SELECT lp.*, p.nombre_producto, p.codigo_producto 
                                      FROM linea_pedido lp 
                                      JOIN productos p ON lp.id_producto = p.id 
@@ -113,15 +112,15 @@ $result = mysqli_stmt_get_result($stmt);
                         
                         <?php if ($pedido['estado'] == 'Pendiente'): ?>
                             <div style="margin-top: 15px; padding: 10px; background-color: #fff3cd; border-radius: 4px;">
-                                ⏳ Tu pedido está siendo preparado para el envío
+                                Tu pedido está siendo preparado para el envío
                             </div>
                         <?php elseif ($pedido['estado'] == 'En tránsito'): ?>
                             <div style="margin-top: 15px; padding: 10px; background-color: #cfe2ff; border-radius: 4px;">
-                                🚚 Tu pedido está en camino. Llegará pronto.
+                                Tu pedido está en camino. Llegará pronto.
                             </div>
                         <?php else: ?>
                             <div style="margin-top: 15px; padding: 10px; background-color: #d1e7dd; border-radius: 4px;">
-                                ✅ Pedido entregado con éxito
+                                Pedido entregado con éxito
                             </div>
                         <?php endif; ?>
                     </div>
