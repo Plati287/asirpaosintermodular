@@ -24,7 +24,9 @@ location ~* \.(css|js|jpg|jpeg|png|gif|ico|webp|svg|woff|woff2)$ {
 
 sudo docker compose restart nginx
 
-<h1>no se este error de momento </h1>
+<h1>no se este error de momento en el servidor de alta disponivilidad</h1>
+
+
 
 <img width="1863" height="949" alt="image" src="https://github.com/user-attachments/assets/38d5d5b5-b8f8-4dcb-b2cf-83d9c59a462e" />
 
