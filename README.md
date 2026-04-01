@@ -24,9 +24,14 @@ location ~* \.(css|js|jpg|jpeg|png|gif|ico|webp|svg|woff|woff2)$ {
 
 sudo docker compose restart nginx
 
-<h1>no se este error de momento en el servidor de alta disponivilidad</h1>
+<h1>error en el servidor de alta disponivilidad</h1>
 
+<img width="1309" height="83" alt="error puerto" src="https://github.com/user-attachments/assets/7cbb70fe-1013-4985-bfaf-dd3ad617c8c4" />
 
+lo que hemos hecho para solucionarlo es añadir esto dentro de el docker de la pagina web para que se pueda conectar el servidor de alta disponivilidad a la base de datos de la web
 
-<img width="1863" height="949" alt="image" src="https://github.com/user-attachments/assets/38d5d5b5-b8f8-4dcb-b2cf-83d9c59a462e" />
-
+ db:
+    image: mysql:8
+    restart: always
+    ports:
+      - "3306:3306"
