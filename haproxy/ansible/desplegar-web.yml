@@ -1,0 +1,36 @@
+- name: Desplegar actualización de TechStore
+  hosts: servidores
+  become: yes
+
+  tasks:
+    - name: Asegurar que todos los contenedores están arriba
+      shell: cd /home/ubuntu/tienda_online_last && docker compose up -d
+
+    - name: Aplicar restart always a todos los contenedores
+      shell: |
+        docker update --restart=always tienda_online_last-db-1
+        docker update --restart=always tienda_online_last-php-1
+        docker update --restart=always tienda_online_last-nginx-1
+        docker update --restart=always tienda_online_last-phpmyadmin-1
+        docker update --restart=always node-exporter
+
+    - name: Dar permisos correctos a los archivos
+      file:
+        path: /home/ubuntu/tienda_online_last/app
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+    - name: Reiniciar contenedor PHP
+      shell: docker restart tienda_online_last-php-1
+
+    - name: Reiniciar contenedor Nginx
+      shell: docker restart tienda_online_last-nginx-1
+
+    - name: Verificar que los contenedores están corriendo
+      shell: "docker ps --format '{%raw%}{{.Names}} - {{.Status}}{%endraw%}'"
+      register: estado_contenedores
+
+    - name: Mostrar estado de contenedores
+      debug:
+        msg: "{{ estado_contenedores.stdout_lines }}"
