@@ -119,6 +119,20 @@ foreach ($tablas_permitidas as $t) {
         
         <aside class="sidebar">
             <h3>base de datos</h3>
+            <?php
+            $iconos = [
+                "clientes"     => ["", "Clientes"],
+                "pedidos"      => ["", "Pedidos"],
+                "linea_pedido" => ["", "Líneas Pedido"],
+                "proveedores"  => ["", "Proveedores"],
+                "categoria"    => ["", "Categorías"],
+                "resenas"      => ["", "Reseñas"],
+                "tienda"       => ["", "Tienda"],
+            ];
+            foreach ($tablas_permitidas as $t):
+                $activo = $tabla_activa === $t ? "activo" : "";
+                [$icono, $nombre] = $iconos[$t];
+            ?>
                 <a href="admin.php?tabla=<?php echo $t; ?>" class="<?php echo $activo; ?>">
                     <span class="tabla-icon"><?php echo $icono; ?></span>
                     <?php echo $nombre; ?>
@@ -237,10 +251,10 @@ foreach ($tablas_permitidas as $t) {
                                 <td>
                                     <div style="display:flex;gap:5px;">
                                         <a href="admin.php?tabla=<?php echo $tabla_activa; ?>&editar=<?php echo $row[$col_id]; ?>"
-                                           class="btn-sm btn-edit"></a>
+                                           class="btn-sm btn-edit">Editar</a>
                                         <button class="btn-sm btn-del"
                                                 onclick="confirmarEliminar(<?php echo $row[$col_id]; ?>, '<?php echo $tabla_activa; ?>', '<?php echo $col_id; ?>')">
-                                            
+                                            Eliminar
                                         </button>
                                     </div>
                                 </td>

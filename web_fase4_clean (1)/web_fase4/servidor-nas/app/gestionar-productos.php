@@ -160,7 +160,7 @@ $result = mysqli_stmt_get_result($stmt);
 
         
         <div class="form-panel">
-            <h2><?php echo $producto_editar ? " editar producto" : " añadir nuevo producto"; ?></h2>
+            <h2><?php echo $producto_editar ? "Editar producto" : "Añadir nuevo producto"; ?></h2>
             <form method="POST" action="gestionar-productos.php" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="<?php echo $producto_editar ? 'editar' : 'añadir'; ?>">
                 <?php if ($producto_editar): ?>
@@ -213,13 +213,13 @@ $result = mysqli_stmt_get_result($stmt);
                                      onerror="this.style.display='none'; document.getElementById('uploadPlaceholder').style.display='flex';"
                                      style="max-height:120px; border-radius:4px; object-fit:contain;">
                                 <div id="uploadPlaceholder" style="display:none; flex-direction:column; align-items:center; gap:6px; color:#95a5a6;">
-                                    <span style="font-size:36px;"></span>
+                                    <span style="font-size:14px; color:#95a5a6;">Subir imagen</span>
                                     <span style="font-size:13px;">click para subir imagen</span>
                                 </div>
                             <?php else: ?>
                                 <img id="previewImg" style="display:none; max-height:120px; border-radius:4px; object-fit:contain;">
                                 <div id="uploadPlaceholder" style="display:flex; flex-direction:column; align-items:center; gap:6px; color:#95a5a6;">
-                                    <span style="font-size:36px;"></span>
+                                    <span style="font-size:14px; color:#95a5a6;">Subir imagen</span>
                                     <span style="font-size:13px;">click para subir imagen</span>
                                     <span style="font-size:11px;">JPG, PNG, WEBP · máx. 5 MB</span>
                                 </div>
@@ -238,7 +238,7 @@ $result = mysqli_stmt_get_result($stmt);
 
                 <div class="form-actions">
                     <button type="submit" class="btn <?php echo $producto_editar ? '' : 'btn-success'; ?>">
-                        <?php echo $producto_editar ? " guardar cambios" : " añadir producto"; ?>
+                        <?php echo $producto_editar ? "Guardar cambios" : "Añadir producto"; ?>
                     </button>
                     <?php if ($producto_editar): ?>
                         <a href="gestionar-productos.php" class="btn btn-secondary">cancelar</a>
@@ -314,10 +314,10 @@ $result = mysqli_stmt_get_result($stmt);
                     <td>
                         <div style="display:flex; gap:6px; flex-wrap:wrap;">
                             <a href="gestionar-productos.php?editar=<?php echo $p['id']; ?>"
-                               class="btn-editar"> editar</a>
+                               class="btn-editar">Editar</a>
                             <button class="btn-eliminar"
                                     onclick="confirmarEliminar(<?php echo $p['id']; ?>, '<?php echo addslashes($p['nombre_producto']); ?>')">
-                                 eliminar
+                                Eliminar
                             </button>
                         </div>
                     </td>

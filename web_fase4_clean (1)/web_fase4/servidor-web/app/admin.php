@@ -251,10 +251,10 @@ foreach ($tablas_permitidas as $t) {
                                 <td>
                                     <div style="display:flex;gap:5px;">
                                         <a href="admin.php?tabla=<?php echo $tabla_activa; ?>&editar=<?php echo $row[$col_id]; ?>"
-                                           class="btn-sm btn-edit"></a>
+                                           class="btn-sm btn-edit">Editar</a>
                                         <button class="btn-sm btn-del"
                                                 onclick="confirmarEliminar(<?php echo $row[$col_id]; ?>, '<?php echo $tabla_activa; ?>', '<?php echo $col_id; ?>')">
-                                            
+                                            Eliminar
                                         </button>
                                     </div>
                                 </td>
