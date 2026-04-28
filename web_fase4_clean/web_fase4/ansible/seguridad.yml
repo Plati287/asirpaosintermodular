@@ -1,0 +1,43 @@
+- name: Hardening de seguridad
+  hosts: servidores
+  become: yes
+
+  tasks:
+    - name: Desactivar servicios innecesarios
+      systemd:
+        name: "{{ item }}"
+        state: stopped
+        enabled: no
+      ignore_errors: yes
+      loop:
+        - ModemManager
+        - fwupd
+        - multipathd
+        - snapd
+        - udisks2
+
+    - name: Política de contraseñas - longitud mínima 12 caracteres
+      lineinfile:
+        path: /etc/security/pwquality.conf
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        create: yes
+      loop:
+        - { regexp: '^minlen', line: 'minlen = 12' }
+        - { regexp: '^minclass', line: 'minclass = 3' }
+        - { regexp: '^maxrepeat', line: 'maxrepeat = 3' }
+        - { regexp: '^dcredit', line: 'dcredit = -1' }
+        - { regexp: '^ucredit', line: 'ucredit = -1' }
+        - { regexp: '^lcredit', line: 'lcredit = -1' }
+        - { regexp: '^ocredit', line: 'ocredit = -1' }
+
+    - name: Bloquear login SSH con contraseña
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+
+    - name: Reiniciar SSH
+      systemd:
+        name: ssh
+        state: restarted
