@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (strlen($contrasena) < 6) {
 	    $error = "La contraseña debe tener al menos 6 caracteres";
     } else {
-        // Comprobar usuario Y email únicos
+        
         $sql = "SELECT id FROM clientes WHERE usuario = ? OR email = ?";
         $stmt=mysqli_prepare($conn, $sql);
         mysqli_stmt_bind_param($stmt, "ss", $usuario, $email);

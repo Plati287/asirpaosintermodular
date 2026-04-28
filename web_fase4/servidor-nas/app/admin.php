@@ -13,13 +13,12 @@ $tabla_activa = isset($_GET["tabla"]) ? $_GET["tabla"] : "clientes";
 $tablas_permitidas = ["clientes", "pedidos", "proveedores", "categoria", "resenas", "linea_pedido", "tienda"];
 if (!in_array($tabla_activa, $tablas_permitidas)) $tabla_activa = "clientes";
 
-// ── ELIMINAR ──────────────────────────────────────────────────────────────────
 if (isset($_POST["action"]) && $_POST["action"] === "eliminar") {
     $tabla = $_POST["tabla"];
     $id    = intval($_POST["id"]);
     $col   = $_POST["col_id"];
     if (in_array($tabla, $tablas_permitidas)) {
-        // Si borramos un cliente, primero borramos sus registros relacionados
+        
         if ($tabla === "clientes") {
             $stmt_pr = mysqli_prepare($conn, "DELETE FROM `password_resets` WHERE `id_cliente` = ?");
             mysqli_stmt_bind_param($stmt_pr, "i", $id);
@@ -33,7 +32,6 @@ if (isset($_POST["action"]) && $_POST["action"] === "eliminar") {
     }
 }
 
-// ── EDITAR ────────────────────────────────────────────────────────────────────
 if (isset($_POST["action"]) && $_POST["action"] === "guardar_edicion") {
     $tabla  = $_POST["tabla"];
     $id     = intval($_POST["id"]);
@@ -61,7 +59,6 @@ if (isset($_POST["action"]) && $_POST["action"] === "guardar_edicion") {
     }
 }
 
-// ── OBTENER COLUMNAS Y DATOS DE LA TABLA ──────────────────────────────────────
 function getColumnas($conn, $tabla) {
     $cols = [];
     $r = mysqli_query($conn, "SHOW COLUMNS FROM `$tabla`");
@@ -80,13 +77,12 @@ function getDatos($conn, $tabla, $buscar = "", $col_buscar = "") {
 }
 
 $columnas    = getColumnas($conn, $tabla_activa);
-$col_id      = $columnas[0]["Field"]; // primera columna = PK
+$col_id      = $columnas[0]["Field"]; 
 $buscar_q    = isset($_GET["buscar"]) ? $_GET["buscar"] : "";
 $col_buscar  = isset($_GET["col_buscar"]) ? $_GET["col_buscar"] : ($columnas[1]["Field"] ?? $col_id);
 $result      = getDatos($conn, $tabla_activa, $buscar_q, $col_buscar);
 $total_rows  = mysqli_num_rows($result);
 
-// Registro a editar
 $registro_editar = null;
 if (isset($_GET["editar"])) {
     $id   = intval($_GET["editar"]);
@@ -96,7 +92,6 @@ if (isset($_GET["editar"])) {
     $registro_editar = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 }
 
-// Conteos para tarjetas resumen
 $counts = [];
 foreach ($tablas_permitidas as $t) {
     $r = mysqli_query($conn, "SELECT COUNT(*) as n FROM `$t`");
@@ -110,175 +105,7 @@ foreach ($tablas_permitidas as $t) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administración - TechStore</title>
     <link rel="stylesheet" href="css/index.css">
-    <style>
-        /* ── Layout ── */
-        .admin-layout { display: flex; gap: 0; min-height: calc(100vh - 70px); }
-        .sidebar {
-            width: 220px;
-            min-width: 220px;
-            background: #2C3E50;
-            padding: 20px 0;
-        }
-        .sidebar h3 {
-            color: #95a5a6;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 0 20px 10px;
-            margin: 0;
-        }
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 20px;
-            color: #bdc3c7;
-            text-decoration: none;
-            font-size: 14px;
-            border-left: 3px solid transparent;
-            transition: all 0.15s;
-        }
-        .sidebar a:hover { background: #34495e; color: white; text-decoration: none; }
-        .sidebar a.activo { background: #34495e; color: white; border-left-color: #3498db; }
-        .sidebar .badge {
-            margin-left: auto;
-            background: #3498db;
-            color: white;
-            font-size: 11px;
-            padding: 2px 7px;
-            border-radius: 10px;
-        }
-        .sidebar .sep { height: 1px; background: #34495e; margin: 10px 20px; }
-        .main-content { flex: 1; padding: 25px; overflow-x: auto; background: #f4f4f4; }
-
-        /* ── Tarjetas resumen ── */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        .stat-card {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-        .stat-card .num { font-size: 28px; font-weight: bold; color: #2C3E50; }
-        .stat-card .lbl { font-size: 12px; color: #7f8c8d; margin-top: 4px; }
-
-        /* ── Tabla ── */
-        .panel { background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); overflow: hidden; }
-        .panel-header {
-            background: #2C3E50;
-            color: white;
-            padding: 14px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .panel-header h2 { margin: 0; font-size: 16px; }
-        .panel-header form { display: flex; gap: 8px; align-items: center; }
-        .panel-header input, .panel-header select {
-            padding: 6px 10px;
-            border: none;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-        .tabla-admin { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .tabla-admin th {
-            background: #ecf0f1;
-            padding: 10px 12px;
-            text-align: left;
-            color: #555;
-            font-size: 12px;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-        .tabla-admin td {
-            padding: 9px 12px;
-            border-bottom: 1px solid #f0f0f0;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            vertical-align: middle;
-        }
-        .tabla-admin tr:last-child td { border-bottom: none; }
-        .tabla-admin tr:hover td { background: #fafafa; }
-        .tabla-footer { padding: 10px 15px; color: #999; font-size: 12px; border-top: 1px solid #eee; }
-
-        /* ── Botones ── */
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-edit  { background: #f39c12; color: white; }
-        .btn-edit:hover  { background: #e67e22; text-decoration: none; }
-        .btn-del   { background: #e74c3c; color: white; }
-        .btn-del:hover   { background: #c0392b; }
-        .btn-save  { background: #27ae60; color: white; }
-        .btn-save:hover  { background: #219a52; }
-        .btn-cancel { background: #95a5a6; color: white; }
-        .btn-cancel:hover { background: #7f8c8d; text-decoration: none; }
-
-        /* ── Formulario edición ── */
-        .edit-panel {
-            background: white;
-            border-radius: 8px;
-            padding: 22px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-            border-left: 4px solid #f39c12;
-        }
-        .edit-panel h3 { color: #2C3E50; margin: 0 0 18px; font-size: 15px; }
-        .edit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
-        .edit-group { display: flex; flex-direction: column; gap: 4px; }
-        .edit-group label { font-size: 12px; color: #666; font-weight: bold; }
-        .edit-group input, .edit-group textarea {
-            padding: 7px 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 13px;
-            font-family: Arial, sans-serif;
-        }
-        .edit-group input:focus, .edit-group textarea:focus { outline: none; border-color: #f39c12; }
-        .edit-group input[readonly] { background: #f8f8f8; color: #999; }
-        .edit-actions { display: flex; gap: 10px; margin-top: 15px; }
-
-        /* ── Mensajes ── */
-        .mensaje { padding: 11px 16px; border-radius: 6px; margin-bottom: 18px; font-weight: bold; font-size: 14px; }
-        .mensaje.exito { background: #d5f5e3; color: #1e8449; border: 1px solid #a9dfbf; }
-        .mensaje.error { background: #fadbd8; color: #922b21; border: 1px solid #f1948a; }
-
-        /* ── Modal ── */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-overlay.active { display: flex; }
-        .modal-box { background: white; border-radius: 8px; padding: 28px; max-width: 380px; width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .modal-box h3 { color: #2C3E50; margin-bottom: 8px; }
-        .modal-box p  { color: #666; margin-bottom: 20px; font-size: 14px; }
-        .modal-btns { display: flex; gap: 10px; justify-content: center; }
-
-        /* ── Iconos de tabla ── */
-        .tabla-icon { font-size: 18px; }
-
-        @media (max-width: 768px) {
-            .admin-layout { flex-direction: column; }
-            .sidebar { width: 100%; min-width: unset; display: flex; flex-wrap: wrap; padding: 10px; gap: 5px; }
-            .sidebar h3, .sidebar .sep { display: none; }
-            .sidebar a { border-left: none; border-bottom: 2px solid transparent; padding: 8px 12px; border-radius: 4px; }
-            .sidebar a.activo { border-bottom-color: #3498db; }
-            .stats-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-    </style>
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
     <header>
@@ -289,18 +116,18 @@ foreach ($tablas_permitidas as $t) {
     </header>
 
     <div class="admin-layout">
-        <!-- ── SIDEBAR ── -->
+        
         <aside class="sidebar">
             <h3>base de datos</h3>
             <?php
             $iconos = [
-                "clientes"     => ["👥", "Clientes"],
-                "pedidos"      => ["📦", "Pedidos"],
-                "linea_pedido" => ["🧾", "Líneas Pedido"],
-                "proveedores"  => ["🏭", "Proveedores"],
-                "categoria"    => ["🏷️", "Categorías"],
-                "resenas"      => ["⭐", "Reseñas"],
-                "tienda"       => ["🏪", "Tienda"],
+                "clientes"     => ["", "Clientes"],
+                "pedidos"      => ["", "Pedidos"],
+                "linea_pedido" => ["", "Líneas Pedido"],
+                "proveedores"  => ["", "Proveedores"],
+                "categoria"    => ["", "Categorías"],
+                "resenas"      => ["", "Reseñas"],
+                "tienda"       => ["", "Tienda"],
             ];
             foreach ($tablas_permitidas as $t):
                 $activo = $tabla_activa === $t ? "activo" : "";
@@ -313,14 +140,14 @@ foreach ($tablas_permitidas as $t) {
                 </a>
             <?php endforeach; ?>
             <div class="sep"></div>
-            <a href="gestionar-productos.php">🛒 Productos</a>
-            <a href="gestionar-envios.php">🚚 Envíos</a>
+            <a href="gestionar-productos.php"> Productos</a>
+            <a href="gestionar-envios.php"> Envíos</a>
         </aside>
 
-        <!-- ── CONTENIDO PRINCIPAL ── -->
+        
         <div class="main-content">
 
-            <!-- Tarjetas resumen -->
+            
             <div class="stats-grid">
                 <?php foreach ($iconos as $t => [$icono, $nombre]): ?>
                 <div class="stat-card">
@@ -335,10 +162,10 @@ foreach ($tablas_permitidas as $t) {
                 <div class="mensaje <?php echo $tipo_mensaje; ?>"><?php echo $mensaje; ?></div>
             <?php endif; ?>
 
-            <!-- ── FORMULARIO EDICIÓN ── -->
+            
             <?php if ($registro_editar): ?>
             <div class="edit-panel">
-                <h3>✏️ editando registro en <strong><?php echo $tabla_activa; ?></strong> — ID <?php echo $registro_editar[$col_id]; ?></h3>
+                <h3> editando registro en <strong><?php echo $tabla_activa; ?></strong>  ID <?php echo $registro_editar[$col_id]; ?></h3>
                 <form method="POST" action="admin.php?tabla=<?php echo $tabla_activa; ?>">
                     <input type="hidden" name="action" value="guardar_edicion">
                     <input type="hidden" name="tabla" value="<?php echo $tabla_activa; ?>">
@@ -351,7 +178,7 @@ foreach ($tablas_permitidas as $t) {
                             $is_pk = $col["Key"] === "PRI";
                         ?>
                         <div class="edit-group">
-                            <label><?php echo $field; ?><?php echo $is_pk ? " 🔑" : ""; ?></label>
+                            <label><?php echo $field; ?><?php echo $is_pk ? " " : ""; ?></label>
                             <?php if ($is_pk): ?>
                                 <input type="text" value="<?php echo htmlspecialchars($val); ?>" readonly>
                             <?php elseif (strlen($val) > 80): ?>
@@ -363,14 +190,14 @@ foreach ($tablas_permitidas as $t) {
                         <?php endforeach; ?>
                     </div>
                     <div class="edit-actions">
-                        <button type="submit" class="btn btn-save btn-sm">💾 guardar cambios</button>
+                        <button type="submit" class="btn btn-save btn-sm"> guardar cambios</button>
                         <a href="admin.php?tabla=<?php echo $tabla_activa; ?>" class="btn btn-cancel btn-sm">cancelar</a>
                     </div>
                 </form>
             </div>
             <?php endif; ?>
 
-            <!-- ── TABLA ── -->
+            
             <div class="panel">
                 <div class="panel-header">
                     <h2><?php echo $iconos[$tabla_activa][0]; ?> <?php echo $iconos[$tabla_activa][1]; ?></h2>
@@ -389,7 +216,7 @@ foreach ($tablas_permitidas as $t) {
                         <button type="submit" class="btn btn-sm" style="background:#3498db;color:white;">buscar</button>
                         <?php if ($buscar_q): ?>
                             <a href="admin.php?tabla=<?php echo $tabla_activa; ?>"
-                               class="btn btn-sm" style="background:#95a5a6;color:white;">✕</a>
+                               class="btn btn-sm" style="background:#95a5a6;color:white;"></a>
                         <?php endif; ?>
                     </form>
                 </div>
@@ -412,22 +239,22 @@ foreach ($tablas_permitidas as $t) {
                             <tr>
                                 <?php foreach ($columnas as $col):
                                     $val = $row[$col["Field"]] ?? "";
-                                    // Ocultar contraseñas
+                                    
                                     if (stripos($col["Field"], "contrasena") !== false || stripos($col["Field"], "password") !== false) {
-                                        $val = "••••••••";
+                                        $val = "";
                                     }
                                 ?>
                                     <td title="<?php echo htmlspecialchars($row[$col["Field"]] ?? ""); ?>">
-                                        <?php echo htmlspecialchars(mb_strimwidth($val, 0, 40, "…")); ?>
+                                        <?php echo htmlspecialchars(mb_strimwidth($val, 0, 40, "")); ?>
                                     </td>
                                 <?php endforeach; ?>
                                 <td>
                                     <div style="display:flex;gap:5px;">
                                         <a href="admin.php?tabla=<?php echo $tabla_activa; ?>&editar=<?php echo $row[$col_id]; ?>"
-                                           class="btn-sm btn-edit">✏️</a>
+                                           class="btn-sm btn-edit">Editar</a>
                                         <button class="btn-sm btn-del"
                                                 onclick="confirmarEliminar(<?php echo $row[$col_id]; ?>, '<?php echo $tabla_activa; ?>', '<?php echo $col_id; ?>')">
-                                            🗑️
+                                            Eliminar
                                         </button>
                                     </div>
                                 </td>
@@ -441,10 +268,10 @@ foreach ($tablas_permitidas as $t) {
         </div>
     </div>
 
-    <!-- ── MODAL ELIMINAR ── -->
+    
     <div class="modal-overlay" id="modalEliminar">
         <div class="modal-box">
-            <h3>⚠️ confirmar eliminación</h3>
+            <h3> confirmar eliminación</h3>
             <p id="modalTexto">¿Seguro que quieres eliminar este registro? Esta acción no se puede deshacer.</p>
             <div class="modal-btns">
                 <form method="POST" action="admin.php?tabla=<?php echo $tabla_activa; ?>" id="formEliminar">

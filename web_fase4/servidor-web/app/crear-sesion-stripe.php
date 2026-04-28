@@ -26,25 +26,22 @@ if (empty($direccion_envio)) {
     exit();
 }
 
-// Guardar dirección en sesión para usarla en pago-exito.php
 $_SESSION["direccion_envio_pendiente"] = $direccion_envio;
 
 \Stripe\Stripe::setApiKey("sk_test_51T99CG3SoBxxvN7zsmz96dZFVVESCtxCOk2hKYaxRBKgmwWBcpIdJmZ3q27FIGbaZhE9izn1Qyf6OB9JqRSzx8iC00MCRH9Sqh");
 
-// Construir line_items para Stripe
 $line_items = [];
 foreach ($carrito as $item) {
     $line_items[] = [
         "price_data" => [
             "currency"     => "eur",
             "product_data" => ["name" => $item["nombre"]],
-            "unit_amount"  => intval(round($item["precio"] * 100)), // en céntimos
+            "unit_amount"  => intval(round($item["precio"] * 100)), 
         ],
         "quantity" => $item["cantidad"],
     ];
 }
 
-// Añadir gastos de envío si aplica
 $total = 0;
 foreach ($carrito as $item) {
     $total += $item["precio"] * $item["cantidad"];
@@ -54,7 +51,7 @@ if ($total < 50) {
         "price_data" => [
             "currency"     => "eur",
             "product_data" => ["name" => "Gastos de envío"],
-            "unit_amount"  => 599, // 5,99€
+            "unit_amount"  => 599, 
         ],
         "quantity" => 1,
     ];

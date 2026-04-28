@@ -147,7 +147,7 @@ $total_resenas=$datos_promedio["total"];
                     <?php endif; ?>
                     
                     <div class="features-box">
-                        <h3>envío gratis en pedidos superiores a 50€</h3>
+                        <h3>envío gratis en pedidos superiores a 50</h3>
                         <h3>garantia de 2 años</h3> 
                         <h3>devolución en 30 dias</h3>
                     </div>

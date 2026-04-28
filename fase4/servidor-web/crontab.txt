@@ -1,2 +1,0 @@
-servidor-web | FAILED | rc=1 >>
-no crontab for ubuntunon-zero return code

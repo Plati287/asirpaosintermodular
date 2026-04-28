@@ -15,36 +15,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $mensaje = "Introduce un email válido.";
         $tipo    = "error";
     } else {
-        // Buscar cliente con ese email
+        
         $stmt = mysqli_prepare($conn, "SELECT id, usuario FROM clientes WHERE email = ?");
         mysqli_stmt_bind_param($stmt, "s", $email);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
 
-        // Siempre mostramos el mismo mensaje por seguridad
+        
         $mensaje = "Si ese email está registrado, recibirás un enlace en breve.";
         $tipo    = "exito";
 
         if ($cliente = mysqli_fetch_assoc($result)) {
-            // Generar token y guardar en BD
+            
             $token   = bin2hex(random_bytes(32));
             $expira  = date("Y-m-d H:i:s", strtotime("+1 hour"));
 
-            // Invalidar tokens anteriores del mismo usuario
+            
             $stmt2 = mysqli_prepare($conn, "UPDATE password_resets SET usado=1 WHERE id_cliente=?");
             mysqli_stmt_bind_param($stmt2, "i", $cliente["id"]);
             mysqli_stmt_execute($stmt2);
 
-            // Insertar nuevo token
+            
             $stmt3 = mysqli_prepare($conn, "INSERT INTO password_resets (id_cliente, token, expira_at) VALUES (?,?,?)");
             mysqli_stmt_bind_param($stmt3, "iss", $cliente["id"], $token, $expira);
             mysqli_stmt_execute($stmt3);
 
-            // Enviar email
+            
             $enlace = SITE_URL . "/restablecer-contrasena.php?token=" . $token;
             $cuerpo = "
                 <div style='font-family:Arial,sans-serif;max-width:500px;margin:auto;'>
-                    <h2 style='color:#2C3E50;'>Recuperar contraseña — TechStore</h2>
+                    <h2 style='color:#2C3E50;'>Recuperar contraseña  TechStore</h2>
                     <p>Hola <strong>" . htmlspecialchars($cliente["usuario"]) . "</strong>,</p>
                     <p>Hemos recibido una solicitud para restablecer tu contraseña.</p>
                     <p>Haz clic en el botón para crear una nueva contraseña. El enlace caduca en <strong>1 hora</strong>.</p>

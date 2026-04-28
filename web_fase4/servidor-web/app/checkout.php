@@ -81,12 +81,12 @@ $total_final = $total + $envio;
                 <div class="payment-method-box">
                     <label class="radio-label">
                         <input type="radio" name="metodo_pago" value="tarjeta" checked>
-                        💳 tarjeta de crédito/débito (Stripe)
+                         tarjeta de crédito/débito (Stripe)
                     </label>
                 </div>
 
                 <div class="info-box" style="margin-top:12px; font-size:0.85rem; background:#f0f7ff; border:1px solid #b3d4f5; border-radius:8px; padding:12px;">
-                    <strong>🧪 Modo test — usa estas tarjetas:</strong><br>
+                    <strong> Modo test  usa estas tarjetas:</strong><br>
                     Visa: <code>4242 4242 4242 4242</code><br>
                     Fecha: cualquier fecha futura · CVC: cualquier 3 dígitos
                 </div>

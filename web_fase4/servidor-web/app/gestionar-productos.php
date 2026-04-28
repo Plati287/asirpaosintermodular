@@ -2,7 +2,6 @@
 require "includes/config.php";
 require "includes/funciones.php";
 
-// Solo admin puede acceder
 if (!estaLogueado() || obtenerNombreUsuario() !== "admin") {
     header("Location: index.php");
     exit();
@@ -11,7 +10,6 @@ if (!estaLogueado() || obtenerNombreUsuario() !== "admin") {
 $mensaje = "";
 $tipo_mensaje = "";
 
-// ELIMINAR PRODUCTO
 if (isset($_POST["action"]) && $_POST["action"] === "eliminar") {
     $id = intval($_POST["id"]);
     $stmt = mysqli_prepare($conn, "DELETE FROM productos WHERE id = ?");
@@ -25,10 +23,9 @@ if (isset($_POST["action"]) && $_POST["action"] === "eliminar") {
     }
 }
 
-// Función para subir imagen
 function subirImagen($archivo, $codigo) {
     if (!isset($archivo) || $archivo["error"] === UPLOAD_ERR_NO_FILE) {
-        return ["ok" => true, "msg" => ""]; // sin imagen, no es error
+        return ["ok" => true, "msg" => ""]; 
     }
     if ($archivo["error"] !== UPLOAD_ERR_OK) {
         return ["ok" => false, "msg" => "Error al subir la imagen."];
@@ -47,7 +44,6 @@ function subirImagen($archivo, $codigo) {
     return ["ok" => true, "msg" => ""];
 }
 
-// AÑADIR PRODUCTO
 if (isset($_POST["action"]) && $_POST["action"] === "añadir") {
     $nombre      = limpiarEntrada($_POST["nombre"]);
     $codigo      = limpiarEntrada($_POST["codigo"]);
@@ -56,7 +52,7 @@ if (isset($_POST["action"]) && $_POST["action"] === "añadir") {
     $stock       = intval($_POST["stock"]);
     $id_cat      = intval($_POST["id_categoria"]);
 
-    // Subir imagen si se proporcionó
+    
     $img_result = subirImagen($_FILES["imagen"] ?? null, $codigo);
     if (!$img_result["ok"]) {
         $mensaje = $img_result["msg"];
@@ -74,7 +70,6 @@ if (isset($_POST["action"]) && $_POST["action"] === "añadir") {
     }
 }
 
-// EDITAR PRODUCTO
 if (isset($_POST["action"]) && $_POST["action"] === "editar") {
     $id          = intval($_POST["id"]);
     $nombre      = limpiarEntrada($_POST["nombre"]);
@@ -84,7 +79,7 @@ if (isset($_POST["action"]) && $_POST["action"] === "editar") {
     $stock       = intval($_POST["stock"]);
     $id_cat      = intval($_POST["id_categoria"]);
 
-    // Subir imagen si se proporcionó
+    
     $img_result = subirImagen($_FILES["imagen"] ?? null, $codigo);
     if (!$img_result["ok"]) {
         $mensaje = $img_result["msg"];
@@ -102,7 +97,6 @@ if (isset($_POST["action"]) && $_POST["action"] === "editar") {
     }
 }
 
-// Cargar producto a editar
 $producto_editar = null;
 if (isset($_GET["editar"])) {
     $id = intval($_GET["editar"]);
@@ -112,7 +106,6 @@ if (isset($_GET["editar"])) {
     $producto_editar = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 }
 
-// Listar productos
 $categorias = obtenerCategorias($conn);
 
 $buscar_q = isset($_GET["buscar"]) ? $_GET["buscar"] : "";
@@ -147,216 +140,7 @@ $result = mysqli_stmt_get_result($stmt);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestionar Productos - TechStore</title>
     <link rel="stylesheet" href="css/index.css">
-    <style>
-        /* ── Tabla ── */
-        .tabla-productos {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-top: 20px;
-        }
-        .tabla-productos th {
-            background-color: #2C3E50;
-            color: white;
-            padding: 12px 15px;
-            text-align: left;
-            font-size: 14px;
-        }
-        .tabla-productos td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-            vertical-align: middle;
-        }
-        .tabla-productos tr:last-child td { border-bottom: none; }
-        .tabla-productos tr:hover td { background-color: #f9f9f9; }
-        .tabla-productos img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-
-        /* ── Botones de acción ── */
-        .btn-editar {
-            background-color: #f39c12;
-            color: white;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-editar:hover { background-color: #e67e22; text-decoration: none; }
-        .btn-eliminar {
-            background-color: #e74c3c;
-            color: white;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        .btn-eliminar:hover { background-color: #c0392b; }
-        .btn-success {
-            background-color: #27ae60;
-        }
-        .btn-success:hover { background-color: #219a52; }
-
-        /* ── Formulario ── */
-        .form-panel {
-            background: white;
-            border-radius: 8px;
-            padding: 25px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        .form-panel h2 {
-            color: #2C3E50;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #3498db;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .form-group.full { grid-column: 1 / -1; }
-        .form-group label {
-            font-size: 13px;
-            font-weight: bold;
-            color: #555;
-        }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 9px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            font-family: Arial, sans-serif;
-        }
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-        .form-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .form-actions .btn { width: auto; padding: 10px 25px; }
-
-        /* ── Mensajes ── */
-        .mensaje {
-            padding: 12px 18px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-        .mensaje.exito { background-color: #d5f5e3; color: #1e8449; border: 1px solid #a9dfbf; }
-        .mensaje.error { background-color: #fadbd8; color: #922b21; border: 1px solid #f1948a; }
-
-        /* ── Filtros ── */
-        .filtros-admin {
-            background: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .filtros-admin input,
-        .filtros-admin select {
-            padding: 8px 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        /* ── Badge stock ── */
-        .badge-stock {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .badge-stock.ok  { background: #d5f5e3; color: #1e8449; }
-        .badge-stock.low { background: #fef9e7; color: #d4ac0d; }
-        .badge-stock.out { background: #fadbd8; color: #922b21; }
-
-        /* ── Modal confirm ── */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal-box {
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        .modal-box h3 { color: #2C3E50; margin-bottom: 10px; }
-        .modal-box p  { color: #666; margin-bottom: 20px; }
-        .modal-btns   { display: flex; gap: 10px; justify-content: center; }
-        .modal-btns .btn { width: auto; padding: 10px 20px; }
-
-        /* ── Área subida imagen ── */
-        .upload-area {
-            border: 2px dashed #bdc3c7;
-            border-radius: 6px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: border-color 0.2s, background 0.2s;
-        }
-        .upload-area:hover {
-            border-color: #3498db;
-            background: #eaf4fd;
-        }
-        .upload-area.drag-over {
-            border-color: #27ae60;
-            background: #eafaf1;
-        }
-
-        @media (max-width: 768px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .tabla-productos th:nth-child(3),
-            .tabla-productos td:nth-child(3),
-            .tabla-productos th:nth-child(5),
-            .tabla-productos td:nth-child(5) { display: none; }
-        }
-    </style>
+    <link rel="stylesheet" href="css/gestionar-productos.css">
 </head>
 <body>
     <header>
@@ -374,9 +158,9 @@ $result = mysqli_stmt_get_result($stmt);
             <div class="mensaje <?php echo $tipo_mensaje; ?>"><?php echo $mensaje; ?></div>
         <?php endif; ?>
 
-        <!-- ── FORMULARIO AÑADIR / EDITAR ── -->
+        
         <div class="form-panel">
-            <h2><?php echo $producto_editar ? "✏️ editar producto" : "➕ añadir nuevo producto"; ?></h2>
+            <h2><?php echo $producto_editar ? "Editar producto" : "Añadir nuevo producto"; ?></h2>
             <form method="POST" action="gestionar-productos.php" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="<?php echo $producto_editar ? 'editar' : 'añadir'; ?>">
                 <?php if ($producto_editar): ?>
@@ -397,7 +181,7 @@ $result = mysqli_stmt_get_result($stmt);
                                placeholder="ej: CPU-003">
                     </div>
                     <div class="form-group">
-                        <label for="precio">precio (€) *</label>
+                        <label for="precio">precio () *</label>
                         <input type="number" id="precio" name="precio" step="0.01" min="0" required
                                value="<?php echo $producto_editar ? htmlspecialchars($producto_editar['precio'] ?? '') : ''; ?>"
                                placeholder="0.00">
@@ -429,13 +213,13 @@ $result = mysqli_stmt_get_result($stmt);
                                      onerror="this.style.display='none'; document.getElementById('uploadPlaceholder').style.display='flex';"
                                      style="max-height:120px; border-radius:4px; object-fit:contain;">
                                 <div id="uploadPlaceholder" style="display:none; flex-direction:column; align-items:center; gap:6px; color:#95a5a6;">
-                                    <span style="font-size:36px;">📷</span>
+                                    <span style="font-size:14px; color:#95a5a6;">Subir imagen</span>
                                     <span style="font-size:13px;">click para subir imagen</span>
                                 </div>
                             <?php else: ?>
                                 <img id="previewImg" style="display:none; max-height:120px; border-radius:4px; object-fit:contain;">
                                 <div id="uploadPlaceholder" style="display:flex; flex-direction:column; align-items:center; gap:6px; color:#95a5a6;">
-                                    <span style="font-size:36px;">📷</span>
+                                    <span style="font-size:14px; color:#95a5a6;">Subir imagen</span>
                                     <span style="font-size:13px;">click para subir imagen</span>
                                     <span style="font-size:11px;">JPG, PNG, WEBP · máx. 5 MB</span>
                                 </div>
@@ -454,7 +238,7 @@ $result = mysqli_stmt_get_result($stmt);
 
                 <div class="form-actions">
                     <button type="submit" class="btn <?php echo $producto_editar ? '' : 'btn-success'; ?>">
-                        <?php echo $producto_editar ? "💾 guardar cambios" : "➕ añadir producto"; ?>
+                        <?php echo $producto_editar ? "Guardar cambios" : "Añadir producto"; ?>
                     </button>
                     <?php if ($producto_editar): ?>
                         <a href="gestionar-productos.php" class="btn btn-secondary">cancelar</a>
@@ -463,7 +247,7 @@ $result = mysqli_stmt_get_result($stmt);
             </form>
         </div>
 
-        <!-- ── FILTROS ── -->
+        
         <form method="GET" action="gestionar-productos.php">
             <div class="filtros-admin">
                 <strong>buscar:</strong>
@@ -488,7 +272,7 @@ $result = mysqli_stmt_get_result($stmt);
             </div>
         </form>
 
-        <!-- ── TABLA DE PRODUCTOS ── -->
+        
         <?php if (mysqli_num_rows($result) > 0): ?>
         <table class="tabla-productos">
             <thead>
@@ -512,7 +296,7 @@ $result = mysqli_stmt_get_result($stmt);
                     </td>
                     <td><strong><?php echo htmlspecialchars($p['nombre_producto']); ?></strong></td>
                     <td><code><?php echo htmlspecialchars($p['codigo_producto']); ?></code></td>
-                    <td><?php echo htmlspecialchars($p['categoria'] ?? '—'); ?></td>
+                    <td><?php echo htmlspecialchars($p['categoria'] ?? ''); ?></td>
                     <td>
                         <?php
                         $precio_mostrar = isset($p['precio']) && $p['precio'] > 0 ? $p['precio'] : 99.99;
@@ -530,10 +314,10 @@ $result = mysqli_stmt_get_result($stmt);
                     <td>
                         <div style="display:flex; gap:6px; flex-wrap:wrap;">
                             <a href="gestionar-productos.php?editar=<?php echo $p['id']; ?>"
-                               class="btn-editar">✏️ editar</a>
+                               class="btn-editar">Editar</a>
                             <button class="btn-eliminar"
                                     onclick="confirmarEliminar(<?php echo $p['id']; ?>, '<?php echo addslashes($p['nombre_producto']); ?>')">
-                                🗑️ eliminar
+                                Eliminar
                             </button>
                         </div>
                     </td>
@@ -549,10 +333,10 @@ $result = mysqli_stmt_get_result($stmt);
         <?php endif; ?>
     </div>
 
-    <!-- ── MODAL CONFIRMAR ELIMINACIÓN ── -->
+    
     <div class="modal-overlay" id="modalEliminar">
         <div class="modal-box">
-            <h3>⚠️ confirmar eliminación</h3>
+            <h3> confirmar eliminación</h3>
             <p id="modalTexto">¿Estás seguro de que quieres eliminar este producto?</p>
             <div class="modal-btns">
                 <form method="POST" action="gestionar-productos.php" id="formEliminar">
@@ -581,11 +365,11 @@ $result = mysqli_stmt_get_result($stmt);
                     placeholder.style.display = "none";
                 };
                 reader.readAsDataURL(input.files[0]);
-                nombreArchivo.textContent = "📎 " + input.files[0].name;
+                nombreArchivo.textContent = " " + input.files[0].name;
             }
         }
 
-        // Drag & drop
+        
         const uploadArea = document.getElementById("uploadArea");
         uploadArea.addEventListener("dragover", e => { e.preventDefault(); uploadArea.classList.add("drag-over"); });
         uploadArea.addEventListener("dragleave", () => uploadArea.classList.remove("drag-over"));
@@ -610,7 +394,7 @@ $result = mysqli_stmt_get_result($stmt);
             if (e.target === this) cerrarModal();
         });
 
-        // Scroll al formulario si hay edición activa
+        
         <?php if ($producto_editar): ?>
         window.onload = () => document.querySelector('.form-panel').scrollIntoView({behavior:'smooth'});
         <?php endif; ?>

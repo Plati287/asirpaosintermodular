@@ -1,8 +1,7 @@
 <?php
 session_start();
 
-// ── Timeout de sesión: 15 minutos de inactividad ──────────────────────────────
-define('SESSION_TIMEOUT', 15 * 60); // 15 minutos en segundos
+define('SESSION_TIMEOUT', 15 * 60); 
 
 if (isset($_SESSION['ultimo_acceso'])) {
     $inactivo = time() - $_SESSION['ultimo_acceso'];

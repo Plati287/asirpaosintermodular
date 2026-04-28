@@ -1,5 +1,5 @@
 <?php
-// Genera el menú de navegación consistente en toda la web
+
 function generarNav() {
     $es_admin = estaLogueado() && obtenerNombreUsuario() === 'admin';
     $logueado = estaLogueado();
@@ -21,7 +21,6 @@ function generarNav() {
     <?php
 }
 
-// Genera la sección user-info del header
 function generarUserInfo() {
     ?>
     <div class="user-info">

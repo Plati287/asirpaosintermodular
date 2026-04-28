@@ -19,7 +19,6 @@ if (empty($session_id)) {
     exit();
 }
 
-// Verificar que el pago fue exitoso en Stripe
 try {
     $stripe_session = \Stripe\Checkout\Session::retrieve($session_id);
 
@@ -32,7 +31,7 @@ try {
         if (!empty($carrito) && !empty($direccion_envio)) {
             mysqli_begin_transaction($conn);
             try {
-                // Verificar stock
+                
                 foreach ($carrito as $item) {
                     $stmt_check = mysqli_prepare($conn, "SELECT stock FROM productos WHERE id = ?");
                     mysqli_stmt_bind_param($stmt_check, "i", $item["id"]);
@@ -44,14 +43,14 @@ try {
                     }
                 }
 
-                // Crear pedido
+                
                 $fecha_envio = date("Y-m-d", strtotime("+3 days"));
                 $stmt = mysqli_prepare($conn, "INSERT INTO pedidos (id_cliente, estado, direccion_envio, fecha_envio) VALUES (?, 'Pagado', ?, ?)");
                 mysqli_stmt_bind_param($stmt, "iss", $_SESSION["usuario_id"], $direccion_envio, $fecha_envio);
                 mysqli_stmt_execute($stmt);
                 $pedido_id = mysqli_insert_id($conn);
 
-                // Insertar líneas y actualizar stock
+                
                 $stmt_linea = mysqli_prepare($conn, "INSERT INTO linea_pedido (id_pedido, id_producto, cantidad, precio_unidad) VALUES (?, ?, ?, ?)");
                 $stmt_stock = mysqli_prepare($conn, "UPDATE productos SET stock = stock - ? WHERE id = ?");
 
@@ -64,7 +63,7 @@ try {
 
                 mysqli_commit($conn);
 
-                // Limpiar sesión
+                
                 $_SESSION["carrito"] = [];
                 unset($_SESSION["direccion_envio_pendiente"]);
                 $pedido_creado = true;
@@ -74,7 +73,7 @@ try {
                 $error = $e->getMessage();
             }
         } else {
-            // El carrito ya fue procesado (recarga de página), mostrar éxito igualmente
+            
             $pedido_creado = true;
         }
     }
@@ -103,7 +102,7 @@ try {
     <div class="container">
         <div class="form-container form-container-narrow">
             <?php if ($pedido_creado): ?>
-                <h2>¡pago realizado con éxito! 🎉</h2>
+                <h2>¡pago realizado con éxito! </h2>
                 <div class="mensaje exito">
                     tu pedido ha sido procesado y el pago confirmado por Stripe.
                 </div>

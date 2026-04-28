@@ -10,7 +10,6 @@ $tipo    = "";
 $token_valido = false;
 $id_cliente   = null;
 
-// Validar token
 if ($token) {
     $ahora = date("Y-m-d H:i:s");
     $stmt  = mysqli_prepare($conn,
@@ -41,12 +40,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $token_valido) {
     } else {
         $hash = password_hash($nueva, PASSWORD_DEFAULT);
 
-        // Actualizar contraseña
+        
         $stmt = mysqli_prepare($conn, "UPDATE clientes SET contrasena=? WHERE id=?");
         mysqli_stmt_bind_param($stmt, "si", $hash, $id_cliente);
         mysqli_stmt_execute($stmt);
 
-        // Marcar token como usado
+        
         $stmt2 = mysqli_prepare($conn, "UPDATE password_resets SET usado=1 WHERE token=?");
         mysqli_stmt_bind_param($stmt2, "s", $token);
         mysqli_stmt_execute($stmt2);
@@ -54,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $token_valido) {
         $mensaje = "¡Contraseña actualizada correctamente! Redirigiendo...";
         $tipo    = "exito";
         header("refresh:2;url=login.php");
-        $token_valido = false; // ocultar formulario
+        $token_valido = false; 
     }
 }
 ?>
